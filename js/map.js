@@ -45,7 +45,7 @@ function initMap() {
     };
     addBegin.change(onChangeHandler);
     addEnd.change(onChangeHandler);
-    $('#submit').click(onChangeHandler);
+ //   $('#submit').click(onChangeHandler);
 
     //Que in waypoints & make origin the destination if none is specified
     function calculateAndDisplayRoute(directionsService, directionsDisplay) {
@@ -419,6 +419,11 @@ function setMarkers(location) {
             map.setZoom(17);
             map.setCenter(marker.getPosition());
             location[i].picBoolTest = true;
+            if (marker.getAnimation() !== null) {
+                marker.setAnimation(null);
+            } else {
+                marker.setAnimation(google.maps.Animation.BOUNCE);
+            }
           }; 
         })(location[i].holdMarker, i));
     }
@@ -428,9 +433,12 @@ function setMarkers(location) {
     //only display the markers and nav elements that match query result
 var viewModel = {
     query: ko.observable(''),
+    doSomething : function() {
+            onChangeHandler();
+        }
 };
 
-viewModel.markers = ko.dependentObservable(function() {
+viewModel.markers = ko.computed(function() {
     var self = this;
     var search = self.query().toLowerCase();
     return ko.utils.arrayFilter(markers, function(marker) {
@@ -596,3 +604,7 @@ var orientation = screen.orientation || screen.mozOrientation || screen.msOrient
   $('#waypoints').attr('size', '5');
 }
 });
+
+window.onerror = function() {
+    $('#failure').css('display', 'block');
+}
