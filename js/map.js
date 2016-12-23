@@ -79,6 +79,7 @@ function initMap() {
      }
     });
     }
+    window.onChangeHandler = onChangeHandler;
 }
 
 
@@ -101,7 +102,7 @@ var markers = [
     lng: -71.388914,
     streetAddress: "461 Main St",
     cityAddress: "Pawtucket, RI 02860",
-    url: "http://www.narragansettbeer.com/",
+    url: "http://narragansettbeer.com/",
     id: "nav0",
     visible: ko.observable(true),
     boolTest: true
@@ -112,7 +113,7 @@ var markers = [
     lng: -71.090214,
     streetAddress: "1 Kendall Square",
     cityAddress: "Cambridge, MA 02139",
-    url: "http://www.cambridgebrewingcompany.com/",
+    url: "http://cambridgebrewingcompany.com/",
     id: "nav1",
     visible: ko.observable(true),
     boolTest: true
@@ -145,7 +146,7 @@ var markers = [
     lng: -70.452222,
     streetAddress: "13-W, 32 Main St",
     cityAddress: "Biddeford, ME 04005",
-    url: "http://www.bandedhorn.com/",
+    url: "http://bandedhorn.com/",
     id: "nav4",
     visible: ko.observable(true),
     boolTest: true
@@ -156,7 +157,7 @@ var markers = [
     lng: -70.890867,
     streetAddress: "283 Derby St",
     cityAddress: "Salem, MA 01970",
-    url: "http://www.notchbrewing.com/",
+    url: "http://notchbrewing.com/",
     id: "nav5",
     visible: ko.observable(true),
     boolTest: true
@@ -200,7 +201,7 @@ var markers = [
     lng: -71.044148,
     streetAddress: "174 Williams St",
     cityAddress: "Chelsea, MA 02150",
-    url: "http://www.mystic-brewery.com/",
+    url: "http://mystic-brewery.com/",
     id: "nav9",
     visible: ko.observable(true),
     boolTest: true
@@ -222,7 +223,7 @@ var markers = [
     lng: -71.074746,
     streetAddress: "89 Commercial St",
     cityAddress: "Malden, MA 02148",
-    url: "http://www.idlehandscraftales.com/",
+    url: "http://idlehandscraftales.com/",
     id: "nav11",
     visible: ko.observable(true),
     boolTest: true
@@ -233,7 +234,7 @@ var markers = [
     lng: -71.442011,
     streetAddress: "1339 Hooksett Rd",
     cityAddress: "Hooksett, NH 03106",
-    url: "http://www.whitebirchbrewing.com/",
+    url: "http://whitebirchbrewing.com/",
     id: "nav12",
     visible: ko.observable(true),
     boolTest: true
@@ -244,7 +245,7 @@ var markers = [
     lng: -72.661653,
     streetAddress: "142 Pleasant St",
     cityAddress: "Easthampton, MA 01027",
-    url: "https://www.abandonedbuildingbrewery.com/",
+    url: "https://abandonedbuildingbrewery.com/",
     id: "nav13",
     visible: ko.observable(true),
     boolTest: true
@@ -277,7 +278,7 @@ var markers = [
     lng: -70.121731,
     streetAddress: "525 US-1",
     cityAddress: "Freeport, ME 04032",
-    url: "http://www.mainebeercompany.com/",
+    url: "http://mainebeercompany.com/",
     id: "nav16",
     visible: ko.observable(true),
     boolTest: true
@@ -373,10 +374,19 @@ function setMarkers(location) {
 
         streetImage();
 
-
         //Fill infoWindow content into each marker
+        var w;
+        var h;
+        var windowWidth = $(window).width();
+        if(windowWidth <= 750) {
+            w = 165;
+            h = 82.5;
+        } else if(windowWidth > 750) {
+            w = 300;
+            h = 150;
+        }
         location[i].contentString = '<img src="' + streetViewImage + 
-                                    '" width="300" height="150" alt="Street View Image of ' + location[i].title + '"><br><hr style="margin-bottom: 5px"><strong>' + 
+                                    '" width="' + w + '" height="' + h + '" alt="Street View Image of ' + location[i].title + '"><br><hr style="margin-bottom: 5px"><strong>' + 
                                     location[i].title + '</strong><br><p>' + 
                                     location[i].streetAddress + '<br>' + 
                                     location[i].cityAddress + '<br></p><a class="web-links" href="http://' + location[i].url + 
@@ -416,7 +426,12 @@ function setMarkers(location) {
           return function() {
             infowindow.setContent(location[i].contentString);
             infowindow.open(map,marker);
-            map.setZoom(17);
+            var windowWidth = $(window).width();
+            if(windowWidth <= 1080) {
+                map.setZoom(14);
+            } else if(windowWidth > 1080) {
+                map.setZoom(16);  
+            }
             map.setCenter(marker.getPosition());
             location[i].picBoolTest = true;
             if (marker.getAnimation() !== null) {

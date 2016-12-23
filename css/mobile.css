@@ -45,6 +45,9 @@ margin-top: 25px;
 #miniNav {
 height: 30px;
 }
+.web-links {
+	font-size: 11px;
+}
 
 @media screen and (orientation: portrait) {
 #info-box {
