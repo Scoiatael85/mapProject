@@ -15,7 +15,8 @@
     <main class="workArea">
       <article id='info-box'>
         <div id="search-nav">    
-            <input id="searchBox" placeholder="Search…" type="input" data-bind="textInput: query, valueUpdate: 'keydown'" autocomplete="off"></input>
+            <!-- <input id="searchBox" placeholder="Search…" type="input" data-bind="textInput: query, valueUpdate: 'keydown'" autocomplete="off"></input> -->
+            <input id="searchBox" placeholder="Search…" type="input" data-bind="textInput: query"></input>
             <button id="directButton" class="grey">Directions</button>
             <div id="scroller">
               <ul data-bind="template: {name: 'marker', foreach:markers}"></ul>

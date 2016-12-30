@@ -455,25 +455,38 @@ var viewModel = {
 
 viewModel.markers = ko.computed(function() {
     var self = this;
+    console.log('--------------');
+    
     var search = self.query().toLowerCase();
+    console.log(search)
+    if (search === "") {
+        console.log("empty");
+        // marker.visible(true);
+        return markers;
+    } else {console.log("not empty");}
+
+
+    console.log($('#searchBox').val())
+    //console.log(marker.hasOwnProperty("holdMarker"));
+    // if no input return the markers array and make sure that all the marker objects are set to visible
+    // also, before accessing the holdMarkers property check if the marker objects have to holdMarker property
+    //else {}
     return ko.utils.arrayFilter(markers, function(marker) {
-    if (marker.title.toLowerCase().indexOf(search) >= 0) {
-            marker.boolTest = true;
-            return marker.visible(true);
-        } else {
-            marker.boolTest = false;
-            setAllMap();
-            return marker.visible(false);
+        var match = marker.title.toLowerCase().indexOf(search) >= 0; // true or false
+ 
+        marker.boolTest = match;
+        // marker.holdMarker.setVisible(match);
+        // marker.visible(true);
+        //console.log(marker.hasOwnProperty("holdMarker"));
+        if (!match) {
+           setAllMap();
         }
+        //console.log(marker.title, marker.boolTest);
+        return match;
     });       
 }, viewModel);
 
 ko.applyBindings(viewModel);
-
-//show $ hide markers in sync with nav
-$("#searchBox").keyup(function() {
-setAllMap();
-});
 
 //Hide and Show entire Nav/Search Bar on click
     // Hide/Show Bound to the img #miniNav
