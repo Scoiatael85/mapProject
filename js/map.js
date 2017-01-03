@@ -45,7 +45,6 @@ function initMap() {
     };
     addBegin.change(onChangeHandler);
     addEnd.change(onChangeHandler);
- //   $('#submit').click(onChangeHandler);
 
     //Que in waypoints & make origin the destination if none is specified
     function calculateAndDisplayRoute(directionsService, directionsDisplay) {
@@ -58,9 +57,15 @@ function initMap() {
         stopover: true
       });
     }
-    if (addEnd.val() === '') {
-        addEnd.val(addBegin.val());
-    }
+    // if (addEnd.val() === '') {
+    //     addEnd.attr('placeholder', addBegin.val());
+    //     if (addEnd.val() === '') {
+    //         addEnd.val(addBegin.val());
+    //     }
+    //     if (addBegin.val() === '' && addEnd.val() === '') {
+    //         addEnd.attr('placeholder', "End Adventure Here...");
+    //     }
+    // }
   }
 
     directionsService.route({
@@ -85,11 +90,17 @@ function initMap() {
 
 //counts the number of markers and sets them on the map
 function setAllMap() {
-  for (var i = 0; i < markers.length; i++) {
-    if(markers[i].boolTest === true) {
-    markers[i].holdMarker.setMap(map);
+  for (var i = 0; i < markersArray.length; i++) {
+    markersArray[i].setMap(map);
+    } 
+  }
+
+function setMarkerVisibility() {
+  for (var i = 0; i < markersArray.length; i++) {
+    if(markersArray[i].boolTest === true) {
+    markersArray[i].setMap(map);
     } else {
-    markers[i].holdMarker.setMap(null);
+//    markersArray[i].setMap(null);
     }
   }
 }
@@ -354,7 +365,7 @@ function streetImage() {
 function setMarkers(location) {
     
     for(i=0; i<location.length; i++) {
-        location[i].holdMarker = new google.maps.Marker({
+        markersArray.push(new google.maps.Marker({
           position: new google.maps.LatLng(location[i].lat, location[i].lng),
           zIndex:1,
           map: map,
@@ -370,7 +381,7 @@ function setMarkers(location) {
             coords: [1,25,-40,-25,1],
             type: 'poly'
           }  
-        });
+        }));
 
         streetImage();
 
@@ -399,7 +410,7 @@ function setMarkers(location) {
         //Click the marker to view infoWindow
             //Zoom in and center location on click
                 //Animate the marker to bounce
-        new google.maps.event.addListener(location[i].holdMarker, 'click', (function(marker, i) {
+        new google.maps.event.addListener(markersArray[i], 'click', (function(marker, i) {
           return function() {
             infowindow.setContent(location[i].contentString);
             infowindow.open(map,this);
@@ -417,7 +428,7 @@ function setMarkers(location) {
                 marker.setAnimation(google.maps.Animation.BOUNCE);
             }
           }; 
-        })(location[i].holdMarker, i));
+        })(markersArray[i], i));
         
         //Click nav element to view infoWindow
             //zoom in and center location on click
@@ -440,7 +451,7 @@ function setMarkers(location) {
                 marker.setAnimation(google.maps.Animation.BOUNCE);
             }
           }; 
-        })(location[i].holdMarker, i));
+        })(markersArray[i], i));
     }
 }
 
@@ -461,30 +472,28 @@ viewModel.markers = ko.computed(function() {
     console.log(search)
     if (search === "") {
         console.log("empty");
-        // marker.visible(true);
+    for(var v=0; v<markersArray.length; v++){
+        markersArray[v].setVisible(true);
+    }
         return markers;
-    } else {console.log("not empty");}
-
-
+    } else {
+    console.log("not empty");
     console.log($('#searchBox').val())
-    //console.log(marker.hasOwnProperty("holdMarker"));
-    // if no input return the markers array and make sure that all the marker objects are set to visible
-    // also, before accessing the holdMarkers property check if the marker objects have to holdMarker property
-    //else {}
+
     return ko.utils.arrayFilter(markers, function(marker) {
         var match = marker.title.toLowerCase().indexOf(search) >= 0; // true or false
  
         marker.boolTest = match;
-        // marker.holdMarker.setVisible(match);
-        // marker.visible(true);
-        //console.log(marker.hasOwnProperty("holdMarker"));
+    for(var v=0; v<markersArray.length; v++){
+        var arMatch = markersArray[v].title.toLowerCase().indexOf(search) >= 0; // true or false
+        markersArray[v].setVisible(arMatch);
+   }
         if (!match) {
-           setAllMap();
+           setMarkerVisibility();
         }
-        //console.log(marker.title, marker.boolTest);
         return match;
     });       
-}, viewModel);
+}}, viewModel);
 
 ko.applyBindings(viewModel);
 
@@ -601,9 +610,6 @@ directButton.click(function() {
 //Make the ending placeholder imitate the begining input 
 var addBegin = $('#addBegin');
 var addEnd = $('#addEnd');
-    addBegin.keyup(function() {
-            addEnd.attr('placeholder', addBegin.val());
-            });
 
 
   //Limit the waypoints to only 6 selected. This is due to the limits
