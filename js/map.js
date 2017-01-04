@@ -45,7 +45,6 @@ function initMap() {
     };
     addBegin.change(onChangeHandler);
     addEnd.change(onChangeHandler);
- //   $('#submit').click(onChangeHandler);
 
     //Que in waypoints & make origin the destination if none is specified
     function calculateAndDisplayRoute(directionsService, directionsDisplay) {
@@ -58,9 +57,15 @@ function initMap() {
         stopover: true
       });
     }
-    if (addEnd.val() === '') {
-        addEnd.val(addBegin.val());
-    }
+    // if (addEnd.val() === '') {
+    //     addEnd.attr('placeholder', addBegin.val());
+    //     if (addEnd.val() === '') {
+    //         addEnd.val(addBegin.val());
+    //     }
+    //     if (addBegin.val() === '' && addEnd.val() === '') {
+    //         addEnd.attr('placeholder', "End Adventure Here...");
+    //     }
+    // }
   }
 
     directionsService.route({
@@ -85,11 +90,17 @@ function initMap() {
 
 //counts the number of markers and sets them on the map
 function setAllMap() {
-  for (var i = 0; i < markers.length; i++) {
-    if(markers[i].boolTest === true) {
-    markers[i].holdMarker.setMap(map);
+  for (var i = 0; i < markersArray.length; i++) {
+    markersArray[i].setMap(map);
+    } 
+  }
+
+function setMarkerVisibility() {
+  for (var i = 0; i < markersArray.length; i++) {
+    if(markersArray[i].boolTest === true) {
+    markersArray[i].setMap(map);
     } else {
-    markers[i].holdMarker.setMap(null);
+//    markersArray[i].setMap(null);
     }
   }
 }
@@ -354,7 +365,7 @@ function streetImage() {
 function setMarkers(location) {
     
     for(i=0; i<location.length; i++) {
-        location[i].holdMarker = new google.maps.Marker({
+        markersArray.push(new google.maps.Marker({
           position: new google.maps.LatLng(location[i].lat, location[i].lng),
           zIndex:1,
           map: map,
@@ -370,7 +381,7 @@ function setMarkers(location) {
             coords: [1,25,-40,-25,1],
             type: 'poly'
           }  
-        });
+        }));
 
         streetImage();
 
@@ -390,7 +401,7 @@ function setMarkers(location) {
                                     location[i].title + '</strong><br><p>' + 
                                     location[i].streetAddress + '<br>' + 
                                     location[i].cityAddress + '<br></p><a class="web-links" href="http://' + location[i].url + 
-                                    '" target="_blank">' + location[i].url + '</a>';
+                                    '" target="_blank">' + location[i].url + '</a><br><div class="forecast"><ul></ul></div>';
 
         var infowindow = new google.maps.InfoWindow({
             content: markers[i].contentString
@@ -399,10 +410,11 @@ function setMarkers(location) {
         //Click the marker to view infoWindow
             //Zoom in and center location on click
                 //Animate the marker to bounce
-        new google.maps.event.addListener(location[i].holdMarker, 'click', (function(marker, i) {
+        new google.maps.event.addListener(markersArray[i], 'click', (function(marker, i) {
           return function() {
             infowindow.setContent(location[i].contentString);
             infowindow.open(map,this);
+//            retrieveWeather();
             var windowWidth = $(window).width();
             if(windowWidth <= 1080) {
                 map.setZoom(14);
@@ -417,7 +429,7 @@ function setMarkers(location) {
                 marker.setAnimation(google.maps.Animation.BOUNCE);
             }
           }; 
-        })(location[i].holdMarker, i));
+        })(markersArray[i], i));
         
         //Click nav element to view infoWindow
             //zoom in and center location on click
@@ -426,6 +438,7 @@ function setMarkers(location) {
           return function() {
             infowindow.setContent(location[i].contentString);
             infowindow.open(map,marker);
+//            retrieveWeather();
             var windowWidth = $(window).width();
             if(windowWidth <= 1080) {
                 map.setZoom(14);
@@ -440,7 +453,7 @@ function setMarkers(location) {
                 marker.setAnimation(google.maps.Animation.BOUNCE);
             }
           }; 
-        })(location[i].holdMarker, i));
+        })(markersArray[i], i));
     }
 }
 
@@ -455,25 +468,36 @@ var viewModel = {
 
 viewModel.markers = ko.computed(function() {
     var self = this;
+    console.log('--------------');
+    
     var search = self.query().toLowerCase();
+    console.log(search)
+    if (search === "") {
+        console.log("empty");
+    for(var v=0; v<markersArray.length; v++){
+        markersArray[v].setVisible(true);
+    }
+        return markers;
+    } else {
+    console.log("not empty");
+    console.log($('#searchBox').val())
+
     return ko.utils.arrayFilter(markers, function(marker) {
-    if (marker.title.toLowerCase().indexOf(search) >= 0) {
-            marker.boolTest = true;
-            return marker.visible(true);
-        } else {
-            marker.boolTest = false;
-            setAllMap();
-            return marker.visible(false);
+        var match = marker.title.toLowerCase().indexOf(search) >= 0; // true or false
+ 
+        marker.boolTest = match;
+    for(var v=0; v<markersArray.length; v++){
+        var arMatch = markersArray[v].title.toLowerCase().indexOf(search) >= 0; // true or false
+        markersArray[v].setVisible(arMatch);
+   }
+        if (!match) {
+           setMarkerVisibility();
         }
+        return match;
     });       
-}, viewModel);
+}}, viewModel);
 
 ko.applyBindings(viewModel);
-
-//show $ hide markers in sync with nav
-$("#searchBox").keyup(function() {
-setAllMap();
-});
 
 //Hide and Show entire Nav/Search Bar on click
     // Hide/Show Bound to the img #miniNav
@@ -588,9 +612,6 @@ directButton.click(function() {
 //Make the ending placeholder imitate the begining input 
 var addBegin = $('#addBegin');
 var addEnd = $('#addEnd');
-    addBegin.keyup(function() {
-            addEnd.attr('placeholder', addBegin.val());
-            });
 
 
   //Limit the waypoints to only 6 selected. This is due to the limits
@@ -623,3 +644,33 @@ var orientation = screen.orientation || screen.mozOrientation || screen.msOrient
 window.onerror = function() {
     $('#failure').css('display', 'block');
 }
+
+//GET Weather Underground JSON
+    //Append Weather forecast for Washington DC to .forecast
+    //If error on GET JSON, display message
+function retrieveWeather(markersArray) {
+var lat = markersArray[i].lat;
+var lng = markersArray[i].lng;
+var weatherUgUrl = "http://api.wunderground.com/api/8b2bf4a9a6f86794/conditions/q/" + lat + "," + lng + ".json";
+
+
+//    http://api.wunderground.com/api/API_KEY/conditions/forecast/alert/q/37.252194,-121.360474.json
+
+$.getJSON(weatherUgUrl, function(data) {
+    var list = $(".forecast");
+    detail = data.current_observation;
+    list.append('<li>Temp: ' + detail.temp_f + '° F</li>');
+    list.append('<li><img style="width: 25px" src="' + detail.icon_url + '">  ' + detail.icon + '</li>');
+}).error(function(e){
+        $(".forecast").append('<p style="text-align: center;">Sorry! Weather Underground</p><p style="text-align: center;">Could Not Be Loaded</p>');
+    });
+}
+
+
+
+
+
+
+
+
+
