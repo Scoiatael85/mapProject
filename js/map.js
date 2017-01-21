@@ -38,55 +38,6 @@ function initMap() {
         resetMap();
     }); 
 
-<<<<<<< HEAD
-=======
-    //Calculate directions and display them Optimized as a Polyline
-    var onChangeHandler = function() {
-      calculateAndDisplayRoute(directionsService, directionsDisplay);
-    };
-    addBegin.change(onChangeHandler);
-    addEnd.change(onChangeHandler);
-
-    //Que in waypoints & make origin the destination if none is specified
-    function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-  var waypts = [];
-  var checkboxArray = document.getElementById('waypoints');
-  for (var i = 0; i < checkboxArray.length; i++) {
-    if (checkboxArray.options[i].selected) {
-      waypts.push({
-        location: checkboxArray[i].value,
-        stopover: true
-      });
-    }
-    // if (addEnd.val() === '') {
-    //     addEnd.attr('placeholder', addBegin.val());
-    //     if (addEnd.val() === '') {
-    //         addEnd.val(addBegin.val());
-    //     }
-    //     if (addBegin.val() === '' && addEnd.val() === '') {
-    //         addEnd.attr('placeholder', "End Adventure Here...");
-    //     }
-    // }
-  }
-
-    directionsService.route({
-      origin: addBegin.val(),
-      destination: addEnd.val(),
-      waypoints: waypts,
-      optimizeWaypoints: true,
-      travelMode: 'DRIVING'
-    }, function(response, status) {
-    if (status === 'OK') {
-        $('#failure').css('display', 'none');
-      directionsDisplay.setDirections(response);
-      var route = response.routes[0];
-    } else {
-       $('#failure').css('display', 'block');
-     }
-    });
-    }
-    window.onChangeHandler = onChangeHandler;
->>>>>>> 85ed52429538fe5c41fef5475943862cc29540cc
 }
 
 //counts the number of markers and sets them on the map
@@ -423,22 +374,6 @@ function setMarkers(location) {
             }
             map.setCenter(marker.getPosition());
             location[i].picBoolTest = true;
-<<<<<<< HEAD
-=======
-            if (marker.getAnimation() !== null) {
-                marker.setAnimation(null);
-            } else {
-                marker.setAnimation(google.maps.Animation.BOUNCE);
-            }
-          }; 
-        })(markersArray[i], i));
-        
-        //Click nav element to view infoWindow
-            //zoom in and center location on click
-        var searchNav = $('#nav' + i);
-        searchNav.click((function(marker, i) {
-          return function() {
->>>>>>> 85ed52429538fe5c41fef5475943862cc29540cc
             infowindow.setContent(location[i].contentString);
             infowindow.open(map,this);
             if (marker.getAnimation() !== null) {
@@ -448,10 +383,7 @@ function setMarkers(location) {
             }
           }; 
         })(markersArray[i], i));
-<<<<<<< HEAD
 
-=======
->>>>>>> 85ed52429538fe5c41fef5475943862cc29540cc
     }
 
     viewModel.locations().forEach(function(location, i) {
@@ -569,63 +501,6 @@ $(window).resize(function() {
         }    
 });
 
-<<<<<<< HEAD
-=======
-
-//Open/close the directions div when clicked
-//this will replace the search-nav div for display
-//repsonsive
-var directBox = $("#directions");
-var directBoxActive = false;
-var directButton = $("#directButton")
-directButton.click(function() {
-    if(directBoxActive === false) {
-        $("#scroller").css("display", "none");
-        directButton.html("Navigation");
-        $("#searchBox").hide(), 500;
-        $("#directions").css("display", "block");
-
-        directBoxActive = true;
-        
-        if($(window).width() < 670 && screen.orientation.type === "landscape-primary") {
-            directButton.animate({
-                width: "95%"
-            }, 500);
-            $('#waypoints').attr('size', '8');
-        } else if($(window).width() < 670 && screen.orientation.type === "portrait-primary") {
-            directButton.animate({
-                width: "95%"
-            }, 500);
-            $('#waypoints').attr('size', '5');
-        } else {directButton.animate({
-            width: "100%"
-            }, 500);}
-    } else {
-        $("#scroller").css("display", "block");
-        $("#searchBox").css("display", "block");
-        $("#directions").css("display", "none");
-        directButton.html("Directions");
-        directBoxActive = false;
-
-        if($(window).width() < 580) {
-            directButton.css("width", "37%");
-            directButton.animate({
-                width: "35%"
-            }, 500);
-        } else {
-        directButton.css("width", "41%");
-        directButton.animate({
-        width: "35%"
-        }, 500);}
-    }
-});
-
-//Make the ending placeholder imitate the begining input 
-var addBegin = $('#addBegin');
-var addEnd = $('#addEnd');
-
-
->>>>>>> 85ed52429538fe5c41fef5475943862cc29540cc
   //Limit the waypoints to only 6 selected. This is due to the limits
     //of using the free goggle.maps APIs
   var last_valid_selection = null;
