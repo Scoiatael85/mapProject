@@ -5,13 +5,6 @@ body {
   margin: 0;
   padding: 0;
 }
-#waypoints {
-  background-color: transparent;
-  overflow-y: auto;
-  border: none;
-  width: 220px;
-  outline: none;
-}
 .workArea {
   height: 100%;
   width: 100%;
@@ -42,38 +35,28 @@ body {
   width: 100%;
 }
 #searchBox {
-  float: left;
   margin-right: 20px;
-}
-.addInput {
-  margin-left: 25%;
 }
 #scroller {
   margin-top: 5px;
   overflow-y: auto;
   height: 375px;
 }
-#scroller li strong {
-  margin-bottom: 5px;
-  font-size: 15px;
+#scroller div a li {
+  margin-top: 5px;
 }
-#scroller li p {
+#scroller div a li p {
   margin-top: 2px;
   margin-bottom: 2px;
   font-size: 12px;
 }
-#directions {
-  height: 375px;
-  display: none;
-}
-#directButton {
-  width: 35%;
-}
-.checkboxText {
-  font-size: 13px;
-}
 #miniNav {
 height: 50px;
+}
+.forecast {
+position: absolute;
+top: 73%;
+left: 55%;
 }
 #failure {
   position: absolute;

@@ -37,56 +37,8 @@ function initMap() {
    $(window).resize(function() {
         resetMap();
     }); 
-    directionsDisplay.setMap(map);
 
-    //Calculate directions and display them Optimized as a Polyline
-    var onChangeHandler = function() {
-      calculateAndDisplayRoute(directionsService, directionsDisplay);
-    };
-    addBegin.change(onChangeHandler);
-    addEnd.change(onChangeHandler);
-
-    //Que in waypoints & make origin the destination if none is specified
-    function calculateAndDisplayRoute(directionsService, directionsDisplay) {
-  var waypts = [];
-  var checkboxArray = document.getElementById('waypoints');
-  for (var i = 0; i < checkboxArray.length; i++) {
-    if (checkboxArray.options[i].selected) {
-      waypts.push({
-        location: checkboxArray[i].value,
-        stopover: true
-      });
-    }
-    // if (addEnd.val() === '') {
-    //     addEnd.attr('placeholder', addBegin.val());
-    //     if (addEnd.val() === '') {
-    //         addEnd.val(addBegin.val());
-    //     }
-    //     if (addBegin.val() === '' && addEnd.val() === '') {
-    //         addEnd.attr('placeholder', "End Adventure Here...");
-    //     }
-    // }
-  }
-
-    directionsService.route({
-      origin: addBegin.val(),
-      destination: addEnd.val(),
-      waypoints: waypts,
-      optimizeWaypoints: true,
-      travelMode: 'DRIVING'
-    }, function(response, status) {
-    if (status === 'OK') {
-        $('#failure').css('display', 'none');
-      directionsDisplay.setDirections(response);
-      var route = response.routes[0];
-    } else {
-       $('#failure').css('display', 'block');
-     }
-    });
-    }
-    window.onChangeHandler = onChangeHandler;
 }
-
 
 //counts the number of markers and sets them on the map
 function setAllMap() {
@@ -401,10 +353,11 @@ function setMarkers(location) {
                                     location[i].title + '</strong><br><p>' + 
                                     location[i].streetAddress + '<br>' + 
                                     location[i].cityAddress + '<br></p><a class="web-links" href="http://' + location[i].url + 
-                                    '" target="_blank">' + location[i].url + '</a><br><div class="forecast"><ul></ul></div>';
+                                    '" target="_blank">' + location[i].url + '</a><br><div></div><div class="forecast"></div>';
 
         var infowindow = new google.maps.InfoWindow({
             content: markers[i].contentString
+
         });
 
         //Click the marker to view infoWindow
@@ -412,17 +365,17 @@ function setMarkers(location) {
                 //Animate the marker to bounce
         new google.maps.event.addListener(markersArray[i], 'click', (function(marker, i) {
           return function() {
+            retrieveWeather(marker);
+            var windowWidth = $(window).width();
+            if(windowWidth <= 1080) {
+                map.setZoom(14);
+            } else if(windowWidth > 1080) {
+                map.setZoom(16);  
+            }
+            map.setCenter(marker.getPosition());
+            location[i].picBoolTest = true;
             infowindow.setContent(location[i].contentString);
             infowindow.open(map,this);
-//            retrieveWeather();
-            var windowWidth = $(window).width();
-            if(windowWidth <= 1080) {
-                map.setZoom(14);
-            } else if(windowWidth > 1080) {
-                map.setZoom(16);  
-            }
-            map.setCenter(marker.getPosition());
-            location[i].picBoolTest = true;
             if (marker.getAnimation() !== null) {
                 marker.setAnimation(null);
             } else {
@@ -430,31 +383,12 @@ function setMarkers(location) {
             }
           }; 
         })(markersArray[i], i));
-        
-        //Click nav element to view infoWindow
-            //zoom in and center location on click
-        var searchNav = $('#nav' + i);
-        searchNav.click((function(marker, i) {
-          return function() {
-            infowindow.setContent(location[i].contentString);
-            infowindow.open(map,marker);
-//            retrieveWeather();
-            var windowWidth = $(window).width();
-            if(windowWidth <= 1080) {
-                map.setZoom(14);
-            } else if(windowWidth > 1080) {
-                map.setZoom(16);  
-            }
-            map.setCenter(marker.getPosition());
-            location[i].picBoolTest = true;
-            if (marker.getAnimation() !== null) {
-                marker.setAnimation(null);
-            } else {
-                marker.setAnimation(google.maps.Animation.BOUNCE);
-            }
-          }; 
-        })(markersArray[i], i));
+
     }
+
+    viewModel.locations().forEach(function(location, i) {
+        location.marker = markersArray[i];
+    });
 }
 
 //Query through the different locations from nav bar with knockout.js
@@ -463,9 +397,16 @@ var viewModel = {
     query: ko.observable(''),
     doSomething : function() {
             onChangeHandler();
-        }
+        },
+    typeAbove: ko.observable(''),
+    showInfo : function(location){
+        google.maps.event.trigger(location.marker, 'click');
+    },
+    availableBreweries: ko.observableArray(markers)
 };
 
+
+viewModel.locations = ko.observableArray(markers);
 viewModel.markers = ko.computed(function() {
     var self = this;
     console.log('--------------');
@@ -515,14 +456,14 @@ function noNav() {
 }
 function yesNav() {
     $("#search-nav").show();
-            var scrollerHeight = $("#directions").height() + 25;
+            var scrollerHeight = $("#info-box").height() - 50;
             if($(window).height() < 500) {
                 $("#search-nav").animate({
                     height: scrollerHeight,
                 }, 500);  
             } else {
             $("#search-nav").animate({
-                height: scrollerHeight,
+                height: scrollerHeight -110,
             }, 500);
             }
             $("#miniNav").attr("src", "img/mapPointer.png");
@@ -560,60 +501,6 @@ $(window).resize(function() {
         }    
 });
 
-
-//Open/close the directions div when clicked
-//this will replace the search-nav div for display
-//repsonsive
-var directBox = $("#directions");
-var directBoxActive = false;
-var directButton = $("#directButton")
-directButton.click(function() {
-    if(directBoxActive === false) {
-        $("#scroller").css("display", "none");
-        directButton.html("Navigation");
-        $("#searchBox").hide(), 500;
-        $("#directions").css("display", "block");
-
-        directBoxActive = true;
-        
-        if($(window).width() < 670 && screen.orientation.type === "landscape-primary") {
-            directButton.animate({
-                width: "95%"
-            }, 500);
-            $('#waypoints').attr('size', '8');
-        } else if($(window).width() < 670 && screen.orientation.type === "portrait-primary") {
-            directButton.animate({
-                width: "95%"
-            }, 500);
-            $('#waypoints').attr('size', '5');
-        } else {directButton.animate({
-            width: "100%"
-            }, 500);}
-    } else {
-        $("#scroller").css("display", "block");
-        $("#searchBox").css("display", "block");
-        $("#directions").css("display", "none");
-        directButton.html("Directions");
-        directBoxActive = false;
-
-        if($(window).width() < 580) {
-            directButton.css("width", "37%");
-            directButton.animate({
-                width: "35%"
-            }, 500);
-        } else {
-        directButton.css("width", "41%");
-        directButton.animate({
-        width: "35%"
-        }, 500);}
-    }
-});
-
-//Make the ending placeholder imitate the begining input 
-var addBegin = $('#addBegin');
-var addEnd = $('#addEnd');
-
-
   //Limit the waypoints to only 6 selected. This is due to the limits
     //of using the free goggle.maps APIs
   var last_valid_selection = null;
@@ -648,13 +535,10 @@ window.onerror = function() {
 //GET Weather Underground JSON
     //Append Weather forecast for Washington DC to .forecast
     //If error on GET JSON, display message
-function retrieveWeather(markersArray) {
-var lat = markersArray[i].lat;
-var lng = markersArray[i].lng;
+function retrieveWeather(marker) {
+var lat = marker.position.lat();
+var lng = marker.position.lng();
 var weatherUgUrl = "http://api.wunderground.com/api/8b2bf4a9a6f86794/conditions/q/" + lat + "," + lng + ".json";
-
-
-//    http://api.wunderground.com/api/API_KEY/conditions/forecast/alert/q/37.252194,-121.360474.json
 
 $.getJSON(weatherUgUrl, function(data) {
     var list = $(".forecast");
