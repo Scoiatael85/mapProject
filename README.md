@@ -30,7 +30,7 @@ This is currently designed to meet the requirements to pass the Udacity test. Ho
 
 ## Setup - Installation
 For the app to function correctly, you need to have a directory containing:
-1. mapProject.html
+1. index.html
 2. 'css' folder
   * style.css
   * style.min.css
