@@ -7,15 +7,15 @@
   <meta name="author" content="Scott J. Davis">
   <meta name="description" content="Map Project">
   <meta name="keywords" content="Map,udacity">
-  <link rel="stylesheet" href="css/style.min.css" type="text/css">
-  <link rel="stylesheet" media='(max-width: 675px)' href="css/mobile.min.css" type="text/css">
+  <link rel="stylesheet" href="css/style.min.css">
+  <link rel="stylesheet" media='(max-width: 675px)' href="css/mobile.min.css">
   </head>
   <body>
     <header id="header"></header>  
     <main class="workArea">
       <article id='info-box'>
         <div id="search-nav">    
-            <input id="searchBox" placeholder="Search…" type="input" data-bind="textInput: query"></input>
+            <input id="searchBox" placeholder="Search…" type="input" data-bind="textInput: query">
             <div id="scroller">
               <ul data-bind="template: {name: 'marker', foreach:markers}"></ul>
               <script type="text/html" id="marker">
@@ -38,9 +38,9 @@
       <article id="failure"><h1>Request Failure!</h1></article>
       <article id="map-canvas"></article>
     </main>
-    <script type="text/javascript" src="js/library/knockout.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
-    <script src='js/map.js'></script>
+    <script src="js/library/knockout.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src='js/map.min.js'></script>
     <script async defer onerror="onerror()"
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVyeAv2wSE0UcCeJVpjp0J8trOk2mjnLE&v=3&callback=initMap">
     </script>
